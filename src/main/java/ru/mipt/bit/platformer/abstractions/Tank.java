@@ -1,20 +1,28 @@
 package ru.mipt.bit.platformer.abstractions;
 
 import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.Direction.Direction;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
 public class Tank {
-    private final float movementSpeed = 0.4f;
+    private final float movementSpeed;
     private float playerMovementProgress = 1f;
     private float playerRotation;
+    private Direction currentDirection = Direction.UP;
     
     // player current position coordinates on level 10x8 grid (e.g. x=0, y=1)
-    private GridPoint2 playerCoordinates = new GridPoint2(0, 1);
+    private GridPoint2 playerCoordinates;
     // which tile the player want to go next
-    private GridPoint2 playerDestinationCoordinates = new GridPoint2(1, 1);
+    private GridPoint2 playerDestinationCoordinates;
 
+
+    public Tank(float movementSpeed, GridPoint2 playerCoordinates, GridPoint2 playerDestinationCoordinates) {
+        this.movementSpeed = movementSpeed;
+        this.playerCoordinates = playerCoordinates;
+        this.playerDestinationCoordinates = playerDestinationCoordinates;
+    }
 
     public float getPlayerMovementProgress() {
         return playerMovementProgress;
@@ -36,36 +44,52 @@ public class Tank {
         return isEqual(playerMovementProgress, 1f);
     }
 
-    public void moveUp(GridPoint2 objectCoordinate) {
+    public void moveUp(GridPoint2 objectCoordinate, Direction direction) {
         if (!objectCoordinate.equals(incrementedY(playerCoordinates))) {
-            playerDestinationCoordinates.y++;
+            
+            var directionVector = direction.getChangeVector();
+            playerDestinationCoordinates.x += directionVector.x;
+            playerDestinationCoordinates.y += directionVector.y;
             playerMovementProgress = 0f;
         }
-        playerRotation = 90f;
+        playerRotation = direction.getRotation();
+        currentDirection = direction;
     }
 
-    public void moveLeft(GridPoint2 objectCoordinate) {
+    public void moveLeft(GridPoint2 objectCoordinate, Direction direction) {
         if (!objectCoordinate.equals(decrementedX(playerCoordinates))) {
-            playerDestinationCoordinates.x--;
+
+            var directionVector = direction.getChangeVector();
+            playerDestinationCoordinates.x += directionVector.x;
+            playerDestinationCoordinates.y += directionVector.y;
             playerMovementProgress = 0f;
         }
-        playerRotation = -180f;
+        playerRotation = direction.getRotation();
+        currentDirection = direction;
     }
 
-    public void moveDown(GridPoint2 objectCoordinate) {
+    public void moveDown(GridPoint2 objectCoordinate, Direction direction) {
         if (!objectCoordinate.equals(decrementedY(playerCoordinates))) {
-            playerDestinationCoordinates.y--;
+
+            var directionVector = direction.getChangeVector();
+            playerDestinationCoordinates.x += directionVector.x;
+            playerDestinationCoordinates.y += directionVector.y;
             playerMovementProgress = 0f;
         }
-        playerRotation = -90f;
+        playerRotation = direction.getRotation();
+        currentDirection = direction;
     }
 
-    public void moveRight(GridPoint2 objectCoordinate) {
+    public void moveRight(GridPoint2 objectCoordinate, Direction direction) {
         if (!objectCoordinate.equals(incrementedX(playerCoordinates))) {
-            playerDestinationCoordinates.x++;
+            
+            var directionVector = direction.getChangeVector();
+            playerDestinationCoordinates.x += directionVector.x;
+            playerDestinationCoordinates.y += directionVector.y;
             playerMovementProgress = 0f;
         }
-        playerRotation = 0f;
+        playerRotation = direction.getRotation();
+        currentDirection = direction;
     }
 
     public void processMovementProgress(float deltaTime) {
