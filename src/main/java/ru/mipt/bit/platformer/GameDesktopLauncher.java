@@ -57,7 +57,7 @@ public class GameDesktopLauncher implements ApplicationListener {
         greenTreeTexture = new Texture("images/greenTree.png");
 
 
-        tank = new Tank();
+        tank = new Tank(0.4f, new GridPoint2(1, 0), new GridPoint2(1, 1));
         Tree tree = new Tree(new GridPoint2(1, 3), 0f);
         
 	    tankGraphics = new TankGraphics(tank, blueTankTexture, tileMovement);
