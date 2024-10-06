@@ -8,9 +8,9 @@ import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
 public class Tank {
     private final float movementSpeed;
-    private float playerMovementProgress = 1f;
+    private float playerMovementProgress;
     private float playerRotation;
-    private Direction currentDirection = Direction.UP;
+    private Direction currentDirection;
     
     // player current position coordinates on level 10x8 grid (e.g. x=0, y=1)
     private GridPoint2 playerCoordinates;
@@ -18,10 +18,12 @@ public class Tank {
     private GridPoint2 playerDestinationCoordinates;
 
 
-    public Tank(float movementSpeed, GridPoint2 playerCoordinates, GridPoint2 playerDestinationCoordinates) {
+    public Tank(Direction currentDirection, float playerMovementProgress, float movementSpeed, GridPoint2 playerCoordinates, GridPoint2 playerDestinationCoordinates) {
         this.movementSpeed = movementSpeed;
         this.playerCoordinates = playerCoordinates;
         this.playerDestinationCoordinates = playerDestinationCoordinates;
+        this.playerMovementProgress = playerMovementProgress;
+        this.currentDirection = currentDirection;
     }
 
     public float getPlayerMovementProgress() {

@@ -14,6 +14,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Interpolation;
 
+import ru.mipt.bit.platformer.Direction.Direction;
 import ru.mipt.bit.platformer.abstractions.Tank;
 import ru.mipt.bit.platformer.abstractions.Tree;
 import ru.mipt.bit.platformer.graphics.TankGraphics;
@@ -57,7 +58,7 @@ public class GameDesktopLauncher implements ApplicationListener {
         greenTreeTexture = new Texture("images/greenTree.png");
 
 
-        tank = new Tank(0.4f, new GridPoint2(1, 0), new GridPoint2(1, 1));
+        tank = new Tank(Direction.UP, 1f, 0.4f, new GridPoint2(1, 0), new GridPoint2(1, 1));
         Tree tree = new Tree(new GridPoint2(1, 3), 0f);
         
 	    tankGraphics = new TankGraphics(tank, blueTankTexture, tileMovement);
