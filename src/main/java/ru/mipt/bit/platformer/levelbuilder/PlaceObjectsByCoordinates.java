@@ -17,6 +17,7 @@ public class PlaceObjectsByCoordinates {
     private final FindCollisions collisionFinder;
 
     private final List<Tree> trees = new ArrayList<>();
+    private final List<Tank> aiTanks = new ArrayList<>();
     private Tank tank;
 
     public PlaceObjectsByCoordinates(List<GridPoint2> tankCoordinatesList,
@@ -27,17 +28,22 @@ public class PlaceObjectsByCoordinates {
         this.treeCoordinatesList = treeCoordinatesList;
         this.collisionFinder = collisionFinder;
 
-        createTank();
+        createTanks();
+
+        tank = aiTanks.remove(aiTanks.size() - 1);
+
         createTrees();
         createBorders(bordersList);
 
     }
 
-    private void createTank() {
-        tank = new Tank(Direction.UP, collisionFinder, 1f, 0.4f, tankCoordinatesList.get(0), incrementedY(tankCoordinatesList.get(0)));
-
-        collisionFinder.addCollidable(tank);
-
+    private void createTanks() {
+        for (GridPoint2 tankCoordinates : tankCoordinatesList) {
+            aiTanks.add(new Tank(Direction.UP, collisionFinder, 1f, 0.4f, tankCoordinates, incrementedY(tankCoordinates)));
+        }
+        for (Tank tank : aiTanks) {
+            collisionFinder.addCollidable(tank);
+        }
     }
 
     private void createTrees() {
@@ -58,6 +64,10 @@ public class PlaceObjectsByCoordinates {
 
     public Tank getTank() {
         return tank;
+    }
+
+    public List<Tank> getAiTanks() {
+        return aiTanks;
     }
 
     public List<Tree> getTrees() {

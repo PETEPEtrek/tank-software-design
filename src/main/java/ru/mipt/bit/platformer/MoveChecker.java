@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx;
 import ru.mipt.bit.platformer.abstractions.Tank;
 import ru.mipt.bit.platformer.abstractions.Tree;
 import ru.mipt.bit.platformer.Direction.Direction;
+import ru.mipt.bit.platformer.ai.ICommand;
+import ru.mipt.bit.platformer.ai.commands.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,26 +22,19 @@ public class MoveChecker {
         this.tank = tank;
     }
 
-    public void checkMoves() {
+    public ICommand checkMoves() {
         if (Gdx.input.isKeyPressed(UP) || Gdx.input.isKeyPressed(W)) {
-            if (tank.isMoving()) {
-                tank.move(Direction.UP);
-            }
+            return new MoveUpCommand(tank);
         }
         if (Gdx.input.isKeyPressed(LEFT) || Gdx.input.isKeyPressed(A)) {
-            if (tank.isMoving()) {
-                tank.move(Direction.LEFT);
-            }
+           return new MoveLeftCommand(tank);
         }
         if (Gdx.input.isKeyPressed(DOWN) || Gdx.input.isKeyPressed(S)) {
-            if (tank.isMoving()) {
-                tank.move(Direction.DOWN);
-            }
+            return new MoveDownCommand(tank);
         }
         if (Gdx.input.isKeyPressed(RIGHT) || Gdx.input.isKeyPressed(D)) {
-            if (tank.isMoving()) {
-                tank.move(Direction.RIGHT);
-            }
+            return new MoveRightCommand(tank);
         }
+        return new StayCommand(tank);
     }
 }

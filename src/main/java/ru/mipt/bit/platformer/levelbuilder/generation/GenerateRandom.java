@@ -18,11 +18,12 @@ public class GenerateRandom implements ILevelBuilder{
     private final Engine engine;
     private final Tank tank;
     private final List<Tree> trees;
+    private final List<Tank> aiTanks;
 
-    public GenerateRandom(int width, int height, int treesNum) {
+    public GenerateRandom(int width, int height, int treesNum, int aiTankNum) {
         FindCollisions collisionFinder = new FindCollisions(new ArrayList<>());
         List<GridPoint2> treeCoordinatesList = new ArrayList<>(generateRandomCoordinates(treesNum, width, height));
-        List<GridPoint2> tankCoordinatesList = new ArrayList<>(generateRandomCoordinates(1, width, height));
+        List<GridPoint2> tankCoordinatesList = new ArrayList<>(generateRandomCoordinates(aiTankNum, width, height));
         List<GridPoint2> levelBorders = new ArrayList<>(createBorderCoordinates(width, height));
 
         PlaceObjectsByCoordinates root = new PlaceObjectsByCoordinates(tankCoordinatesList,
@@ -31,8 +32,9 @@ public class GenerateRandom implements ILevelBuilder{
                 collisionFinder);
         
         tank = root.getTank();
+        aiTanks = root.getAiTanks();
         trees = root.getTrees();
-        engine = new Engine(tank);
+        engine = new Engine(tank, aiTanks);
 
     }
 
@@ -74,5 +76,10 @@ public class GenerateRandom implements ILevelBuilder{
     @Override
     public Tank getTank() {
         return tank;
+    }
+
+    @Override
+    public List<Tank> getAiTanks() {
+        return aiTanks;
     }
 }

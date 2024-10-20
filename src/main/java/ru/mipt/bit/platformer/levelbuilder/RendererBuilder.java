@@ -35,6 +35,7 @@ public class RendererBuilder {
 
     public Renderer generateRenderer(ILevelBuilder levelBuilder) {
         generateTankGraphics(levelBuilder);
+	generateAiTanksGraphics(levelBuilder);
         generateTreesGraphics(levelBuilder);
         return renderer;
     }
@@ -52,6 +53,15 @@ public class RendererBuilder {
             TreeGraphics treeGraphics = new TreeGraphics(tree, treeTexture, renderer.getTileMovement());
             renderer.addDrawableObject(treeGraphics);
             renderer.moveRectangleAtTileCenter(treeGraphics.getRectangle(), tree.getCoordinates());
+        }
+    }
+
+    private void generateAiTanksGraphics(ILevelBuilder levelBuilder) {
+        generateTankGraphics(levelBuilder);
+        List<Tank> aiTanks = levelBuilder.getAiTanks();
+        for (Tank tank : aiTanks) {
+            TankGraphics tankGraphics = new TankGraphics(tank, tankTexture, renderer.getTileMovement());
+            renderer.addDrawableObject(tankGraphics);
         }
     }
 }

@@ -16,6 +16,7 @@ public class GenerateFromFile implements ILevelBuilder {
     private final Engine engine;
     private final Tank tank;
     private final List<Tree> trees;
+    private final List<Tank> aiTanks;
 
     public GenerateFromFile(String file) {
         FindCollisions collisionFinder = new FindCollisions(new ArrayList<>());
@@ -29,8 +30,9 @@ public class GenerateFromFile implements ILevelBuilder {
                 collisionFinder);
 
         tank = root.getTank();
+        aiTanks = root.getAiTanks();
         trees = root.getTrees();
-        engine = new Engine(tank);
+        engine = new Engine(tank, aiTanks);
 
     }
 
@@ -102,6 +104,11 @@ public class GenerateFromFile implements ILevelBuilder {
     @Override
     public List<Tree> getTrees() {
         return trees;
+    }
+
+    @Override
+    public List<Tank> getAiTanks() {
+        return aiTanks;
     }
 
 }
