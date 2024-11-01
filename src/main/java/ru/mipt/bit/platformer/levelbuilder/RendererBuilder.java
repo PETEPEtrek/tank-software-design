@@ -8,6 +8,9 @@ import ru.mipt.bit.platformer.abstractions.Tree;
 import ru.mipt.bit.platformer.graphics.Renderer;
 import ru.mipt.bit.platformer.graphics.TankGraphics;
 import ru.mipt.bit.platformer.graphics.TreeGraphics;
+import ru.mipt.bit.platformer.graphics.HpToggle;
+import ru.mipt.bit.platformer.graphics.TankWithHpGraphics;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +21,19 @@ public class RendererBuilder {
     private final List<Texture> textures = new ArrayList<>();
     private final Texture tankTexture;
     private final Texture treeTexture;
+    private final HpToggle showHp;
 
     public RendererBuilder(String levelConfigFileName,
                            String tankTextureFile,
-                           String treeTextureFile) {
+                           String treeTextureFile,
+                           HpToggle showHp) {
         renderer = new Renderer(new SpriteBatch(), new TmxMapLoader().load(levelConfigFileName), new ArrayList<>());
         tankTexture = new Texture(tankTextureFile);
+        this.showHp = showHp;
         textures.add(tankTexture);
         treeTexture = new Texture(treeTextureFile);
         textures.add(treeTexture);
+
     }
 
     public List<Texture> getTextures() {
@@ -35,14 +42,14 @@ public class RendererBuilder {
 
     public Renderer generateRenderer(ILevelBuilder levelBuilder) {
         generateTankGraphics(levelBuilder);
-	generateAiTanksGraphics(levelBuilder);
+	    generateAiTanksGraphics(levelBuilder);
         generateTreesGraphics(levelBuilder);
         return renderer;
     }
 
     private void generateTankGraphics(ILevelBuilder levelBuilder) {
         Tank tank = levelBuilder.getTank();
-        TankGraphics tankGraphics = new TankGraphics(tank, tankTexture, renderer.getTileMovement());
+        TankGraphics tankGraphics = new TankWithHpGraphics(tank, tankTexture, renderer.getTileMovement(), showHp);
         renderer.addDrawableObject(tankGraphics);
     }
 
@@ -60,7 +67,7 @@ public class RendererBuilder {
         generateTankGraphics(levelBuilder);
         List<Tank> aiTanks = levelBuilder.getAiTanks();
         for (Tank tank : aiTanks) {
-            TankGraphics tankGraphics = new TankGraphics(tank, tankTexture, renderer.getTileMovement());
+            TankGraphics tankGraphics = new TankWithHpGraphics(tank, tankTexture, renderer.getTileMovement(), showHp);
             renderer.addDrawableObject(tankGraphics);
         }
     }

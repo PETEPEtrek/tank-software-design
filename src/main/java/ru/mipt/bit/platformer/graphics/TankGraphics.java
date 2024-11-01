@@ -13,9 +13,9 @@ import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled
 
 public class TankGraphics implements DrawInterface {
 
-    private Rectangle rectangle;
+    protected Rectangle rectangle;
 
-    private final Tank tank;
+    protected final Tank tank;
 
     private final Texture texture;
     private final TextureRegion textureRegion;

@@ -7,6 +7,7 @@ import ru.mipt.bit.platformer.levelbuilder.ILevelBuilder;
 import ru.mipt.bit.platformer.levelbuilder.PlaceObjectsByCoordinates;
 import ru.mipt.bit.platformer.engine.Engine;
 import ru.mipt.bit.platformer.collisions.FindCollisions;
+import ru.mipt.bit.platformer.graphics.HpToggle;
 
 import java.io.FileReader;
 import java.util.*;
@@ -18,7 +19,7 @@ public class GenerateFromFile implements ILevelBuilder {
     private final List<Tree> trees;
     private final List<Tank> aiTanks;
 
-    public GenerateFromFile(String file) {
+    public GenerateFromFile(String file, HpToggle showHp) {
         FindCollisions collisionFinder = new FindCollisions(new ArrayList<>());
         List<GridPoint2> tankCoordinates = new ArrayList<>(getSymbolCoordinates("X", file));
         List<GridPoint2> treeCoordinates = new ArrayList<>(getSymbolCoordinates("T", file));
@@ -32,7 +33,7 @@ public class GenerateFromFile implements ILevelBuilder {
         tank = root.getTank();
         aiTanks = root.getAiTanks();
         trees = root.getTrees();
-        engine = new Engine(tank, aiTanks);
+        engine = new Engine(tank, aiTanks, showHp);
 
     }
 

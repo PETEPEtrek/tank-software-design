@@ -16,6 +16,7 @@ public class Tank implements Collidability {
     private float playerRotation;
     private Direction currentDirection;
     private final FindCollisions collisionFinder;
+    private float hp;
     
     // player current position coordinates on level 10x8 grid (e.g. x=0, y=1)
     private GridPoint2 playerCoordinates;
@@ -36,6 +37,10 @@ public class Tank implements Collidability {
         this.playerDestinationCoordinates = playerDestinationCoordinates;
         this.playerMovementProgress = playerMovementProgress;
         this.currentDirection = currentDirection;
+    }
+
+    public float getHp() {
+        return hp;
     }
 
     public float getPlayerMovementProgress() {

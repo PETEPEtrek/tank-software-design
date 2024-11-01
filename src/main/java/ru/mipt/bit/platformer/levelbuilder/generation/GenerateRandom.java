@@ -12,6 +12,7 @@ import ru.mipt.bit.platformer.levelbuilder.ILevelBuilder;
 import ru.mipt.bit.platformer.levelbuilder.PlaceObjectsByCoordinates;
 import ru.mipt.bit.platformer.engine.Engine;
 import ru.mipt.bit.platformer.collisions.FindCollisions;
+import ru.mipt.bit.platformer.graphics.HpToggle;
 
 //class for random generation of level
 public class GenerateRandom implements ILevelBuilder{
@@ -20,7 +21,7 @@ public class GenerateRandom implements ILevelBuilder{
     private final List<Tree> trees;
     private final List<Tank> aiTanks;
 
-    public GenerateRandom(int width, int height, int treesNum, int aiTankNum) {
+    public GenerateRandom(int width, int height, int treesNum, int aiTankNum, HpToggle showHp) {
         FindCollisions collisionFinder = new FindCollisions(new ArrayList<>());
         List<GridPoint2> treeCoordinatesList = new ArrayList<>(generateRandomCoordinates(treesNum, width, height));
         List<GridPoint2> tankCoordinatesList = new ArrayList<>(generateRandomCoordinates(aiTankNum, width, height));
@@ -34,7 +35,7 @@ public class GenerateRandom implements ILevelBuilder{
         tank = root.getTank();
         aiTanks = root.getAiTanks();
         trees = root.getTrees();
-        engine = new Engine(tank, aiTanks);
+        engine = new Engine(tank, aiTanks, showHp);
 
     }
 

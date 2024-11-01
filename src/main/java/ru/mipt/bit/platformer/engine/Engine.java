@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import ru.mipt.bit.platformer.MoveChecker;
 import ru.mipt.bit.platformer.abstractions.Tank;
 import ru.mipt.bit.platformer.ai.CommandCenter;
+import ru.mipt.bit.platformer.graphics.HpToggle;
 
 import java.util.List;
 
@@ -15,10 +16,10 @@ public class Engine {
     private final CommandCenter commandCenter;
     private final MoveChecker moveChecker;
 
-    public Engine(Tank tank, List<Tank> aiTanks) {
+    public Engine(Tank tank, List<Tank> aiTanks, HpToggle showHp) {
         this.tank = tank;
         this.aiTanks = aiTanks;
-        this.moveChecker = new MoveChecker(tank);
+        this.moveChecker = new MoveChecker(tank, showHp);
         this.commandCenter = new CommandCenter(aiTanks);
     }
 
@@ -29,7 +30,7 @@ public class Engine {
     public void doCalculations() {
         moveChecker.checkMoves().doCommand();
 	if (aiTanks.size() > 0) {
-	commandCenter.generateCommand().doCommand();
+	    commandCenter.generateCommand().doCommand();
 	}
         tank.processMovementProgress(getDeltaTime());
         for (Tank tank : aiTanks) {

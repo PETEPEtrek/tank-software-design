@@ -12,6 +12,7 @@ import ru.mipt.bit.platformer.levelbuilder.ILevelBuilder;
 import ru.mipt.bit.platformer.levelbuilder.RendererBuilder;
 import ru.mipt.bit.platformer.graphics.Renderer;
 import ru.mipt.bit.platformer.engine.Engine;
+import ru.mipt.bit.platformer.graphics.HpToggle;
 
 
 
@@ -20,12 +21,13 @@ public class GameDesktopLauncher implements ApplicationListener {
     private RendererBuilder rendererBuilder;
     private Engine engine;
     private Renderer renderer;
+    private final HpToggle showHp = new HpToggle();
 
     @Override
     public void create() {
-        ILevelBuilder levelBuilder = new GenerateFromFile("src/main/resources/level.txt");
+        ILevelBuilder levelBuilder = new GenerateFromFile("src/main/resources/level.txt", showHp);
         //ILevelBuilder levelBuilder = new GenerateRandom(7, 6, 3);
-        rendererBuilder = new RendererBuilder("level.tmx", "images/tank_blue.png", "images/greenTree.png");
+        rendererBuilder = new RendererBuilder("level.tmx", "images/tank_blue.png", "images/greenTree.png", showHp);
         engine = levelBuilder.getEngine();
         renderer = rendererBuilder.generateRenderer(levelBuilder);
     }

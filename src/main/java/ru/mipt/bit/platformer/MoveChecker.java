@@ -7,6 +7,7 @@ import ru.mipt.bit.platformer.abstractions.Tree;
 import ru.mipt.bit.platformer.Direction.Direction;
 import ru.mipt.bit.platformer.ai.ICommand;
 import ru.mipt.bit.platformer.ai.commands.*;
+import ru.mipt.bit.platformer.graphics.HpToggle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,11 +16,12 @@ import java.util.List;
 import static com.badlogic.gdx.Input.Keys.*;
 
 public class MoveChecker {
-
+    private final HpToggle showHp;
     private final Tank tank;
 
-    public MoveChecker(Tank tank) {
+    public MoveChecker(Tank tank, HpToggle showHp) {
         this.tank = tank;
+        this.showHp = showHp;
     }
 
     public ICommand checkMoves() {
@@ -34,6 +36,9 @@ public class MoveChecker {
         }
         if (Gdx.input.isKeyPressed(RIGHT) || Gdx.input.isKeyPressed(D)) {
             return new MoveRightCommand(tank);
+        }
+        if (Gdx.input.isKeyPressed(H)) {
+            showHp.changeToggle();
         }
         return new StayCommand(tank);
     }
