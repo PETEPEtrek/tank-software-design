@@ -7,4 +7,6 @@ public interface DrawInterface {
     void drawMove();
 
     void drawTexture(Batch batch);
+
+    Object getDrawnObject();
 }

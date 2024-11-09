@@ -8,11 +8,5 @@ import java.util.List;
 
 //interface for building levels
 public interface ILevelBuilder {
-    Tank getTank();
-
-    List<Tank> getAiTanks();
-    
-    List<Tree> getTrees();
-
-    Engine getEngine();
+    Level getLevel();
 }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlaceObjectsByCoordinates {
+    private final Level level;
     private final List<GridPoint2> tankCoordinatesList;
     private final List<GridPoint2> treeCoordinatesList;
     private final FindCollisions collisionFinder;
@@ -20,10 +21,12 @@ public class PlaceObjectsByCoordinates {
     private final List<Tank> aiTanks = new ArrayList<>();
     private Tank tank;
 
-    public PlaceObjectsByCoordinates(List<GridPoint2> tankCoordinatesList,
+    public PlaceObjectsByCoordinates(Level level,
+                                     List<GridPoint2> tankCoordinatesList,
                                      List<GridPoint2> treeCoordinatesList,
                                      List<GridPoint2> bordersList,
                                      FindCollisions collisionFinder) {
+        this.level = level;
         this.tankCoordinatesList = tankCoordinatesList;
         this.treeCoordinatesList = treeCoordinatesList;
         this.collisionFinder = collisionFinder;
@@ -39,7 +42,7 @@ public class PlaceObjectsByCoordinates {
 
     private void createTanks() {
         for (GridPoint2 tankCoordinates : tankCoordinatesList) {
-            aiTanks.add(new Tank(Direction.UP, collisionFinder, 1f, 0.4f, tankCoordinates, incrementedY(tankCoordinates)));
+            aiTanks.add(new Tank(level, Direction.UP, collisionFinder, 1f, 0.4f, tankCoordinates, incrementedY(tankCoordinates)));
         }
         for (Tank tank : aiTanks) {
             collisionFinder.addCollidable(tank);

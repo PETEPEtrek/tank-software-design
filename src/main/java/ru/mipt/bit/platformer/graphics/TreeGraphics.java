@@ -44,4 +44,9 @@ public class TreeGraphics implements DrawInterface {
         drawTextureRegionUnscaled(batch, textureRegion, rectangle, tree.getRotation());
     }
 
+    @Override
+    public Object getDrawnObject() {
+        return tree;
+    }
+
 }

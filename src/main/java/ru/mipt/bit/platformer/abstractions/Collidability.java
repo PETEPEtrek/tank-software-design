@@ -19,4 +19,6 @@ public interface Collidability {
     }
 
     Collection<GridPoint2> getCoordinateList();
+
+    default void registerDamage(){}
 }

@@ -1,6 +1,8 @@
 package ru.mipt.bit.platformer.levelbuilder.generation;
 
 import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.eventmanager.Events;
+import ru.mipt.bit.platformer.levelbuilder.Level;
 import ru.mipt.bit.platformer.abstractions.Tank;
 import ru.mipt.bit.platformer.abstractions.Tree;
 import ru.mipt.bit.platformer.levelbuilder.ILevelBuilder;
@@ -14,26 +16,13 @@ import java.util.*;
 
 //class for reading from file
 public class GenerateFromFile implements ILevelBuilder {
-    private final Engine engine;
-    private final Tank tank;
-    private final List<Tree> trees;
-    private final List<Tank> aiTanks;
+    private Level level;
+    private final String file;
+    private HpToggle showHp;
 
     public GenerateFromFile(String file, HpToggle showHp) {
-        FindCollisions collisionFinder = new FindCollisions(new ArrayList<>());
-        List<GridPoint2> tankCoordinates = new ArrayList<>(getSymbolCoordinates("X", file));
-        List<GridPoint2> treeCoordinates = new ArrayList<>(getSymbolCoordinates("T", file));
-        List<GridPoint2> borders = new ArrayList<>(getBordersFromFile(file));
-
-        PlaceObjectsByCoordinates root = new PlaceObjectsByCoordinates(tankCoordinates,
-                treeCoordinates,
-                borders, 
-                collisionFinder);
-
-        tank = root.getTank();
-        aiTanks = root.getAiTanks();
-        trees = root.getTrees();
-        engine = new Engine(tank, aiTanks, showHp);
+        this.file = file;
+        this.showHp = showHp;
 
     }
 
@@ -93,23 +82,33 @@ public class GenerateFromFile implements ILevelBuilder {
         }
     }
 
-    public Engine getEngine() {
-        return engine;
-    }
 
     @Override
-    public Tank getTank() {
-        return tank;
-    }
+    public Level getLevel() {
+        if (level != null) return level;
+        List<GridPoint2> treeCoordinates = new ArrayList<>(getSymbolCoordinates("T", file));
+        List<GridPoint2> tankCoordinates = new ArrayList<>(getSymbolCoordinates("X", file));
+        List<GridPoint2> levelBorders = new ArrayList<>(getBordersFromFile(file));
+        FindCollisions collisionFinder = new FindCollisions(new ArrayList<>());
 
-    @Override
-    public List<Tree> getTrees() {
-        return trees;
-    }
+        List<Events> events = new ArrayList<>();
+        events.add(Events.CREATE_BULLET);
+        events.add(Events.DELETE_BULLET);
+        events.add(Events.DELETE_TANK);
+        level = new Level(events);
+        PlaceObjectsByCoordinates root = new PlaceObjectsByCoordinates(level, tankCoordinates,
+                    treeCoordinates,
+                    levelBorders, 
+                    collisionFinder);
 
-    @Override
-    public List<Tank> getAiTanks() {
-        return aiTanks;
+        Tank tank = root.getTank();
+        List<Tank> aiTanks = root.getAiTanks();
+        List<Tree> trees = root.getTrees();
+
+        level.addTank(tank);
+        level.addTrees(trees);
+        level.addAiTanks(aiTanks);
+        return level;
     }
 
 }

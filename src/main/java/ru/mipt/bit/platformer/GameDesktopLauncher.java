@@ -8,11 +8,14 @@ import com.badlogic.gdx.graphics.Texture;
 
 import ru.mipt.bit.platformer.levelbuilder.generation.GenerateFromFile;
 import ru.mipt.bit.platformer.levelbuilder.generation.GenerateRandom;
+import ru.mipt.bit.platformer.levelbuilder.Level;
+import ru.mipt.bit.platformer.eventmanager.Events;
 import ru.mipt.bit.platformer.levelbuilder.ILevelBuilder;
 import ru.mipt.bit.platformer.levelbuilder.RendererBuilder;
 import ru.mipt.bit.platformer.graphics.Renderer;
 import ru.mipt.bit.platformer.engine.Engine;
 import ru.mipt.bit.platformer.graphics.HpToggle;
+import ru.mipt.bit.platformer.ai.CommandCenter;
 
 
 
@@ -26,10 +29,14 @@ public class GameDesktopLauncher implements ApplicationListener {
     @Override
     public void create() {
         ILevelBuilder levelBuilder = new GenerateFromFile("src/main/resources/level.txt", showHp);
+        Level level = levelBuilder.getLevel();
         //ILevelBuilder levelBuilder = new GenerateRandom(7, 6, 3);
-        rendererBuilder = new RendererBuilder("level.tmx", "images/tank_blue.png", "images/greenTree.png", showHp);
-        engine = levelBuilder.getEngine();
+        rendererBuilder = new RendererBuilder("level.tmx", "images/tank_blue.png", "images/greenTree.png", "images/bullet.png", showHp);
+        engine = new Engine(level, new CommandCenter(level.getAiTanks()), showHp);
         renderer = rendererBuilder.generateRenderer(levelBuilder);
+        level.subscribe(Events.DELETE_TANK, renderer);
+        level.subscribe(Events.CREATE_BULLET, renderer);
+        level.subscribe(Events.DELETE_BULLET, renderer);
     }
 
     @Override

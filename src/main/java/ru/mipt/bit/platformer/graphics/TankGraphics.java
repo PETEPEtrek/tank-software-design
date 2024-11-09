@@ -44,4 +44,9 @@ public class TankGraphics implements DrawInterface {
         drawTextureRegionUnscaled(batch, textureRegion, rectangle, tank.getPlayerRotation());
     }
 
+    @Override
+    public Object getDrawnObject() {
+        return tank;
+    }
+
 }

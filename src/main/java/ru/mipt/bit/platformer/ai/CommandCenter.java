@@ -9,6 +9,7 @@ public class CommandCenter {
 
     private final List<Tank> aiTanks;
 
+
     public CommandCenter(List<Tank> aiTanks) {
         this.aiTanks = aiTanks;
     }
@@ -26,6 +27,8 @@ public class CommandCenter {
                 return new MoveDownCommand(aiTanks.get(aiTankNum));
             case 3:
                 return new MoveLeftCommand(aiTanks.get(aiTankNum));
+            case 4:
+                return new ShootCommand(aiTanks.get(aiTankNum));
             default:
                 return new StayCommand(aiTanks.get(aiTankNum));
         }

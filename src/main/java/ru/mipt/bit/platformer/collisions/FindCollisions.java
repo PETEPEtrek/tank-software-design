@@ -15,12 +15,17 @@ public class FindCollisions {
         collidableObjects.add(collidable);
     }
 
+    public void deleteCollidable(Collidability collidable) {
+        collidableObjects.remove(collidable);
+    }
+
     public boolean hasCollisions(Collidability collidable) {
         for (Collidability collidableObject : collidableObjects) {
-            if (collidable.findCollision(collidableObject) && !collidable.equals(collidableObject)) {
+            if (!collidable.equals(collidableObject) && collidable.findCollision(collidableObject)) {
                 return true;
             }
         }
         return false;
     }
+
 }

@@ -40,6 +40,9 @@ public class MoveChecker {
         if (Gdx.input.isKeyPressed(H)) {
             showHp.changeToggle();
         }
+        if (Gdx.input.isKeyPressed(SPACE)) {
+            return new ShootCommand(tank);
+        }
         return new StayCommand(tank);
     }
 }

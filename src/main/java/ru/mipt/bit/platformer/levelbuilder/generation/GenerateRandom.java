@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
-
+import ru.mipt.bit.platformer.eventmanager.Events;
+import ru.mipt.bit.platformer.levelbuilder.Level;
 import com.badlogic.gdx.math.GridPoint2;
 import ru.mipt.bit.platformer.abstractions.Tank;
 import ru.mipt.bit.platformer.abstractions.Tree;
@@ -16,26 +17,19 @@ import ru.mipt.bit.platformer.graphics.HpToggle;
 
 //class for random generation of level
 public class GenerateRandom implements ILevelBuilder{
-    private final Engine engine;
-    private final Tank tank;
-    private final List<Tree> trees;
-    private final List<Tank> aiTanks;
+    private Level level;
+    private final int width;
+    private final int height;
+    private final int treesNum;
+    private final int aiTankNum;
+    private HpToggle showHp;
 
     public GenerateRandom(int width, int height, int treesNum, int aiTankNum, HpToggle showHp) {
-        FindCollisions collisionFinder = new FindCollisions(new ArrayList<>());
-        List<GridPoint2> treeCoordinatesList = new ArrayList<>(generateRandomCoordinates(treesNum, width, height));
-        List<GridPoint2> tankCoordinatesList = new ArrayList<>(generateRandomCoordinates(aiTankNum, width, height));
-        List<GridPoint2> levelBorders = new ArrayList<>(createBorderCoordinates(width, height));
-
-        PlaceObjectsByCoordinates root = new PlaceObjectsByCoordinates(tankCoordinatesList,
-                treeCoordinatesList,
-                levelBorders, 
-                collisionFinder);
-        
-        tank = root.getTank();
-        aiTanks = root.getAiTanks();
-        trees = root.getTrees();
-        engine = new Engine(tank, aiTanks, showHp);
+        this.width = width;
+        this.height = height;
+        this.treesNum = treesNum;
+        this.aiTankNum = aiTankNum;
+        this.showHp = showHp;
 
     }
 
@@ -65,22 +59,34 @@ public class GenerateRandom implements ILevelBuilder{
         return randomCoordinates;
     }
 
-    public Engine getEngine() {
-        return engine;
-    }
+    
 
     @Override
-    public List<Tree> getTrees() {
-        return trees;
-    }
+    public Level getLevel() {
+        if (level != null) return level;
+        List<GridPoint2> treeCoordinates = new ArrayList<>(generateRandomCoordinates(treesNum, width, height));
+        List<GridPoint2> tankCoordinates = new ArrayList<>(generateRandomCoordinates(aiTankNum, width, height));
+        List<GridPoint2> levelBorders = new ArrayList<>(createBorderCoordinates(width, height));
+        FindCollisions collisionFinder = new FindCollisions(new ArrayList<>());
 
-    @Override
-    public Tank getTank() {
-        return tank;
-    }
+        List<Events> events = new ArrayList<>();
+        events.add(Events.CREATE_BULLET);
+        events.add(Events.DELETE_BULLET);
+        events.add(Events.DELETE_TANK);
+        level = new Level(events);
+        PlaceObjectsByCoordinates root = new PlaceObjectsByCoordinates(level, tankCoordinates,
+                    treeCoordinates,
+                    levelBorders, 
+                    collisionFinder);
 
-    @Override
-    public List<Tank> getAiTanks() {
-        return aiTanks;
+
+        Tank tank = root.getTank();
+        List<Tank> aiTanks = root.getAiTanks();
+        List<Tree> trees = root.getTrees();
+
+        level.addTank(tank);
+        level.addTrees(trees);
+        level.addAiTanks(aiTanks);
+        return level;
     }
 }
