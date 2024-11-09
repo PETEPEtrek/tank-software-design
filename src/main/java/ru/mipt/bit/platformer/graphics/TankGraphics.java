@@ -13,9 +13,9 @@ import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled
 
 public class TankGraphics implements DrawInterface {
 
-    private Rectangle rectangle;
+    protected Rectangle rectangle;
 
-    private final Tank tank;
+    protected final Tank tank;
 
     private final Texture texture;
     private final TextureRegion textureRegion;
@@ -42,6 +42,11 @@ public class TankGraphics implements DrawInterface {
     @Override
     public void drawTexture(Batch batch) {
         drawTextureRegionUnscaled(batch, textureRegion, rectangle, tank.getPlayerRotation());
+    }
+
+    @Override
+    public Object getDrawnObject() {
+        return tank;
     }
 
 }
