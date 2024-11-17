@@ -13,6 +13,7 @@ import ru.mipt.bit.platformer.graphics.TreeGraphics;
 import ru.mipt.bit.platformer.graphics.BulletGraphics;
 import ru.mipt.bit.platformer.graphics.HpToggle;
 import ru.mipt.bit.platformer.graphics.TankWithHpGraphics;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 import java.util.ArrayList;
@@ -32,14 +33,20 @@ public class RendererBuilder {
                            String treeTextureFile,
                            String bulletTextureFile,
                            HpToggle showHp) {
-        renderer = new Renderer(this, new SpriteBatch(), new TmxMapLoader().load(levelConfigFileName), new CopyOnWriteArrayList<>());
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("appContext.xml");
+
+        TmxMapLoader loader = ctx.getBean("tmxmaploader", TmxMapLoader.class);
+        var lvl = loader.load(levelConfigFileName);
+        var batch = ctx.getBean("spritebatch", SpriteBatch.class);
         tankTexture = new Texture(tankTextureFile);
         this.showHp = showHp;
         textures.add(tankTexture);
         treeTexture = new Texture(treeTextureFile);
         bulletTexture = new Texture(bulletTextureFile);
         textures.add(treeTexture);
+        textures.add(bulletTexture);
 
+        renderer = new Renderer(this, batch, lvl, new CopyOnWriteArrayList<>());
     }
 
     public List<Texture> getTextures() {
@@ -81,5 +88,9 @@ public class RendererBuilder {
     public void generateBulletGraphics(Bullet bullet) {
         BulletGraphics bulletGraphics = new BulletGraphics(bullet, bulletTexture, renderer.getTileMovement());
         renderer.addDrawableObject(bulletGraphics);
+    }
+
+    public HpToggle getHpToggle() {
+        return showHp;
     }
 }

@@ -22,14 +22,12 @@ public class GenerateRandom implements ILevelBuilder{
     private final int height;
     private final int treesNum;
     private final int aiTankNum;
-    private HpToggle showHp;
 
-    public GenerateRandom(int width, int height, int treesNum, int aiTankNum, HpToggle showHp) {
+    public GenerateRandom(int width, int height, int treesNum, int aiTankNum) {
         this.width = width;
         this.height = height;
         this.treesNum = treesNum;
         this.aiTankNum = aiTankNum;
-        this.showHp = showHp;
 
     }
 

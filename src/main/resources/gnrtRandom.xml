@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="genrandom" class="ru.mipt.bit.platformer.levelbuilder.generation.GenerateRandom.java">
+        <constructor-arg index="0" value="${genrand.width}"/>
+        <constructor-arg index="1" value="${genrand.height}"/>
+        <constructor-arg index="2" value="${genrand.treenum}"/>
+        <constructor-arg index="3" value="${genrand.tanknum}"/>
+    </bean>
+</beans>

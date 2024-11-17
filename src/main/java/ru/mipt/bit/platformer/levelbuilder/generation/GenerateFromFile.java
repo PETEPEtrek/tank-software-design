@@ -18,11 +18,9 @@ import java.util.*;
 public class GenerateFromFile implements ILevelBuilder {
     private Level level;
     private final String file;
-    private HpToggle showHp;
 
-    public GenerateFromFile(String file, HpToggle showHp) {
+    public GenerateFromFile(String file) {
         this.file = file;
-        this.showHp = showHp;
 
     }
 

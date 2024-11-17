@@ -16,22 +16,24 @@ import ru.mipt.bit.platformer.graphics.Renderer;
 import ru.mipt.bit.platformer.engine.Engine;
 import ru.mipt.bit.platformer.graphics.HpToggle;
 import ru.mipt.bit.platformer.ai.CommandCenter;
-
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 public class GameDesktopLauncher implements ApplicationListener {
 
     private RendererBuilder rendererBuilder;
+    private ClassPathXmlApplicationContext ctx;
     private Engine engine;
     private Renderer renderer;
-    private final HpToggle showHp = new HpToggle();
+    private HpToggle showHp;
 
     @Override
     public void create() {
-        ILevelBuilder levelBuilder = new GenerateFromFile("src/main/resources/level.txt", showHp);
+        ctx = new ClassPathXmlApplicationContext("appContext.xml");
+        ILevelBuilder levelBuilder = ctx.getBean("genfile", GenerateFromFile.class);
         Level level = levelBuilder.getLevel();
-        //ILevelBuilder levelBuilder = new GenerateRandom(7, 6, 3);
-        rendererBuilder = new RendererBuilder("level.tmx", "images/tank_blue.png", "images/greenTree.png", "images/bullet.png", showHp);
+        rendererBuilder = ctx.getBean("rend", RendererBuilder.class);
+        showHp = rendererBuilder.getHpToggle();
         engine = new Engine(level, new CommandCenter(level.getAiTanks()), showHp);
         renderer = rendererBuilder.generateRenderer(levelBuilder);
         level.subscribe(Events.DELETE_TANK, renderer);
@@ -63,7 +65,6 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void dispose() {
-        // dispose of all the native resources (classes which implement com.badlogic.gdx.utils.Disposable)
         for (Texture texture : rendererBuilder.getTextures()) {
             texture.dispose();
         }
