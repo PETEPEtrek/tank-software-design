@@ -1,0 +1,124 @@
+package ru.mipt.bit.platformer.levelbuilder.generation;
+
+import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.eventmanager.Events;
+import ru.mipt.bit.platformer.levelbuilder.Level;
+import ru.mipt.bit.platformer.abstractions.Tank;
+import ru.mipt.bit.platformer.abstractions.Tree;
+import ru.mipt.bit.platformer.levelbuilder.ILevelBuilder;
+import ru.mipt.bit.platformer.levelbuilder.PlaceObjectsByCoordinates;
+import ru.mipt.bit.platformer.engine.Engine;
+import ru.mipt.bit.platformer.collisions.FindCollisions;
+import ru.mipt.bit.platformer.graphics.HpToggle;
+import ru.mipt.bit.platformer.ai.IAbstraction;
+
+import java.io.FileReader;
+import java.util.*;
+
+//class for reading from file
+public class GenerateFromFile implements ILevelBuilder {
+    private Level level;
+    private final String file;
+
+    public GenerateFromFile(String file) {
+        this.file = file;
+
+    }
+
+    private Set<GridPoint2> getSymbolCoordinates(String symbol, String file) {
+        List<List<String>> symbolMap = new ArrayList<>();
+        getSymbolMapFromFile(symbolMap, file);
+
+
+        Collections.reverse(symbolMap);
+        Set<GridPoint2> coordinates = new HashSet<>();
+
+        for (int i = 0; i < symbolMap.size(); i++) {
+            for (int j = 0; j < symbolMap.get(i).size(); j++) {
+
+                if (symbolMap.get(i).get(j).equals(symbol)) {
+                    coordinates.add(new GridPoint2(j, i));
+                }
+
+            }
+        }
+        return coordinates;
+    }
+
+    private Set<GridPoint2> getBordersFromFile(String file) {
+        List<List<String>> symbolMap = new ArrayList<>();
+        getSymbolMapFromFile(symbolMap, file);
+
+        Set<GridPoint2> borders = new HashSet<>();
+
+        int height = symbolMap.size();
+        int width = symbolMap.get(0).size();
+
+        for (int i = 0; i < height; i++) {
+            borders.add(new GridPoint2(width, i));
+            borders.add(new GridPoint2(-1, i));
+        }
+
+        for (int j = 0; j < width; j++) {
+            borders.add(new GridPoint2(j, height));
+            borders.add(new GridPoint2(j, -1));
+        }
+        return borders;
+    }
+
+    private void getSymbolMapFromFile(List<List<String>> symbolMap, String file) {
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(new FileReader(file));
+        } catch (Throwable ex) {
+            System.out.println(ex.getMessage());
+        }
+
+        if (scanner != null) {
+            while (scanner.hasNextLine()) {
+                symbolMap.add(Arrays.asList(scanner.nextLine().split("")));
+            }
+        }
+    }
+
+
+    @Override
+    public Level getLevel() {
+        if (level != null) return level;
+        List<GridPoint2> treeCoordinates = new ArrayList<>(getSymbolCoordinates("T", file));
+        List<GridPoint2> tankCoordinates = new ArrayList<>(getSymbolCoordinates("X", file));
+        List<GridPoint2> levelBorders = new ArrayList<>(getBordersFromFile(file));
+        FindCollisions collisionFinder = new FindCollisions(new ArrayList<>());
+
+        List<Events> events = new ArrayList<>();
+        events.add(Events.CREATE_BULLET);
+        events.add(Events.DELETE_BULLET);
+        events.add(Events.DELETE_TANK);
+        level = new Level(events);
+        PlaceObjectsByCoordinates root = new PlaceObjectsByCoordinates(level, tankCoordinates,
+                    treeCoordinates,
+                    levelBorders, 
+                    collisionFinder);
+
+        Tank tank = root.getTank();
+        List<IAbstraction> playerTank = new ArrayList<>();
+        playerTank.add((IAbstraction) tank);
+        List<Tank> aiTanks = root.getAiTanks();
+        List<IAbstraction> aiTanksAbs = new ArrayList<>();
+        for (Tank aiTank: aiTanks) {
+            aiTanksAbs.add((IAbstraction) aiTank);
+        }
+
+        List<Tree> trees = root.getTrees();
+        List<IAbstraction> treesAbs = new ArrayList<>();
+        for (Tree tree: trees) {
+            treesAbs.add((IAbstraction) tree);
+        }
+
+        level.addAbstraction(playerTank);
+        level.addAbstraction(treesAbs);
+        level.addAbstraction(aiTanksAbs);
+        return level;
+    }
+
+}

@@ -1,78 +1,132 @@
 package ru.mipt.bit.platformer.abstractions;
 
+import ru.mipt.bit.platformer.levelbuilder.Level;
 import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.Direction.Direction;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+
+import ru.mipt.bit.platformer.collisions.FindCollisions;
+import ru.mipt.bit.platformer.ai.IAbstraction;
+import ru.mipt.bit.platformer.ai.commands.IShoot;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
-public class Tank {
-    private final float movementSpeed = 0.4f;
-    private float playerMovementProgress = 1f;
-    private float playerRotation;
+public class Tank implements Collidability, IAbstraction, IShoot, Moving {
+    private final Level level;
+    private final float movementSpeed;
+    private float tankMovementProgress;
+    private float tankRotation;
+    private Direction currentDirection;
+    private final FindCollisions collisionFinder;
+    private float hp = 3;
+    private long lastShoot = new Date().getTime();
     
-    // player current position coordinates on level 10x8 grid (e.g. x=0, y=1)
-    private GridPoint2 playerCoordinates = new GridPoint2(0, 1);
-    // which tile the player want to go next
-    private GridPoint2 playerDestinationCoordinates = new GridPoint2(1, 1);
+    // tank current position coordinates on level 10x8 grid (e.g. x=0, y=1)
+    private GridPoint2 tankCoordinates;
+    // which tile the tank want to go next
+    private GridPoint2 tankDestinationCoordinates;
 
 
-    public float getPlayerMovementProgress() {
-        return playerMovementProgress;
+    public Tank( Level level,
+                 Direction currentDirection,
+                 FindCollisions collisionFinder,
+                 float tankMovementProgress,
+                 float movementSpeed,
+                 GridPoint2 tankCoordinates, 
+                 GridPoint2 tankDestinationCoordinates) {
+        this.level = level;
+        this.movementSpeed = movementSpeed;
+        this.collisionFinder = collisionFinder;
+        this.tankCoordinates = tankCoordinates;
+        this.tankDestinationCoordinates = tankDestinationCoordinates;
+        this.tankMovementProgress = tankMovementProgress;
+        this.currentDirection = currentDirection;
     }
 
-    public float getPlayerRotation() {
-        return playerRotation;
+    public float getHp() {
+        return hp;
+    }
+    @Override
+    public void shoot() {
+        if (!canChootInThisTick()) return;
+        Bullet bullet = new Bullet(collisionFinder, level, this, currentDirection);
+        level.registerBulletCreation(bullet);
     }
 
-    public GridPoint2 getPlayerCoordinates() {
-        return playerCoordinates;
+    private boolean canChootInThisTick() {
+        long nowDate = new Date().getTime();
+        if (nowDate - lastShoot > 1000) {
+            lastShoot = nowDate;
+            return true;
+        }
+        return false;
     }
 
-    public GridPoint2 getPlayerDestinationCoordinates() {
-        return playerDestinationCoordinates;
+    public float getMovementProgress() {
+        return tankMovementProgress;
+    }
+    @Override
+    public float getRotation() {
+        return tankRotation;
+    }
+    @Override
+    public GridPoint2 getCoordinates() {
+        return tankCoordinates;
+    }
+
+    public GridPoint2 getDestinationCoordinates() {
+        return tankDestinationCoordinates;
     }
 
     public boolean isMoving() {
-        return isEqual(playerMovementProgress, 1f);
+        return isEqual(tankMovementProgress, 1f);
     }
 
-    public void moveUp(GridPoint2 objectCoordinate) {
-        if (!objectCoordinate.equals(incrementedY(playerCoordinates))) {
-            playerDestinationCoordinates.y++;
-            playerMovementProgress = 0f;
+    private boolean hasCollision() {
+        return collisionFinder.hasCollisions(this);
+    }
+
+    // function for moving in all 4 directions
+    public void move(Direction direction) {
+        if (!isEqual(tankMovementProgress, 1f)) {
+            return;
         }
-        playerRotation = 90f;
-    }
 
-    public void moveLeft(GridPoint2 objectCoordinate) {
-        if (!objectCoordinate.equals(decrementedX(playerCoordinates))) {
-            playerDestinationCoordinates.x--;
-            playerMovementProgress = 0f;
+        var directionVector = direction.getChangeVector();
+        tankDestinationCoordinates.x += directionVector.x;
+        tankDestinationCoordinates.y += directionVector.y;
+
+        if (hasCollision()) {
+            tankDestinationCoordinates.x -= directionVector.x;
+            tankDestinationCoordinates.y -= directionVector.y;
+        } else {
+            tankMovementProgress = 0f;
         }
-        playerRotation = -180f;
+        tankRotation = direction.getRotation();
+        currentDirection = direction;
     }
-
-    public void moveDown(GridPoint2 objectCoordinate) {
-        if (!objectCoordinate.equals(decrementedY(playerCoordinates))) {
-            playerDestinationCoordinates.y--;
-            playerMovementProgress = 0f;
-        }
-        playerRotation = -90f;
-    }
-
-    public void moveRight(GridPoint2 objectCoordinate) {
-        if (!objectCoordinate.equals(incrementedX(playerCoordinates))) {
-            playerDestinationCoordinates.x++;
-            playerMovementProgress = 0f;
-        }
-        playerRotation = 0f;
-    }
-
+    @Override
     public void processMovementProgress(float deltaTime) {
-        playerMovementProgress = continueProgress(playerMovementProgress, deltaTime, movementSpeed);
-        if (isEqual(playerMovementProgress, 1f)) {
-            // record that the player has reached his/her destination
-            playerCoordinates.set(playerDestinationCoordinates);
+        tankMovementProgress = continueProgress(tankMovementProgress, deltaTime, movementSpeed);
+        if (isEqual(tankMovementProgress, 1f)) {
+            // record that the tank has reached his/her destination
+            tankCoordinates.set(tankDestinationCoordinates);
+        }
+    }
+
+    @Override
+    public Collection<GridPoint2> getCoordinateList() {
+        return Arrays.asList(tankCoordinates, tankDestinationCoordinates);
+    }
+
+    @Override
+    public void registerDamage() {
+        hp--;
+        if (hp <= 0) {
+            level.registerTankDestruction(this);
         }
     }
 

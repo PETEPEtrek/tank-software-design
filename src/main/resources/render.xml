@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="tmxmaploader" class="com.badlogic.gdx.maps.tiled.TmxMapLoader">
+    </bean>
+
+    <bean id="hptoggle" class="ru.mipt.bit.platformer.graphics.HpToggle">
+    </bean>
+
+    <bean id="spritebatch" class="com.badlogic.gdx.graphics.g2d.SpriteBatch">
+    </bean>
+
+    <bean id="rend" class="ru.mipt.bit.platformer.levelbuilder.RendererBuilder">
+        <constructor-arg index="0" value="${map.levelConfigFileName}"/>
+        <constructor-arg index="1" value="${map.tankTextureFile}"/>
+        <constructor-arg index="2" value="${map.treeTextureFile}"/>
+        <constructor-arg index="3" value="${map.bulletTexture}"/>
+        <constructor-arg index="4" ref="hptoggle"/>
+    </bean>
+</beans>
