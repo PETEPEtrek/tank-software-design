@@ -5,7 +5,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.Texture;
 
-
+import com.badlogic.gdx.Gdx;
 import ru.mipt.bit.platformer.levelbuilder.generation.GenerateFromFile;
 import ru.mipt.bit.platformer.levelbuilder.generation.GenerateRandom;
 import ru.mipt.bit.platformer.levelbuilder.Level;
@@ -15,8 +15,15 @@ import ru.mipt.bit.platformer.levelbuilder.RendererBuilder;
 import ru.mipt.bit.platformer.graphics.Renderer;
 import ru.mipt.bit.platformer.engine.Engine;
 import ru.mipt.bit.platformer.graphics.HpToggle;
-import ru.mipt.bit.platformer.ai.CommandCenter;
+import ru.mipt.bit.platformer.ai.commands.IPersona;
+import ru.mipt.bit.platformer.ai.commands.AI;
+import ru.mipt.bit.platformer.ai.commands.AILib;
+import ru.mipt.bit.platformer.ai.commands.Player;
+import ru.mipt.bit.platformer.ai.commands.PlayerLib;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import ru.mipt.bit.platformer.abstractions.Tank;
+
+import java.util.*;
 
 
 public class GameDesktopLauncher implements ApplicationListener {
@@ -26,6 +33,7 @@ public class GameDesktopLauncher implements ApplicationListener {
     private Engine engine;
     private Renderer renderer;
     private HpToggle showHp;
+    private final List<IPersona> personas = new ArrayList<>();
 
     @Override
     public void create() {
@@ -34,7 +42,14 @@ public class GameDesktopLauncher implements ApplicationListener {
         Level level = levelBuilder.getLevel();
         rendererBuilder = ctx.getBean("rend", RendererBuilder.class);
         showHp = rendererBuilder.getHpToggle();
-        engine = new Engine(level, new CommandCenter(level.getAiTanks()), showHp);
+
+        Tank playerTank = level.getTank();
+        List<Tank> aiTanks = level.getAiTanks();
+        personas.add(new Player(new PlayerLib().getCommandLib(), playerTank));
+        for (Tank aiTank: aiTanks) {
+            personas.add(new AI(new AILib().getCommandLib(), aiTank));
+        }
+        engine = new Engine(level, personas, showHp);
         renderer = rendererBuilder.generateRenderer(levelBuilder);
         level.subscribe(Events.DELETE_TANK, renderer);
         level.subscribe(Events.CREATE_BULLET, renderer);
@@ -43,8 +58,12 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void render() {
-        engine.doCalculations();
+        engine.doCalculations(getDeltaTime());
         renderer.doRender();
+    }
+
+    public float getDeltaTime() {
+        return Gdx.graphics.getDeltaTime();
     }
 
 

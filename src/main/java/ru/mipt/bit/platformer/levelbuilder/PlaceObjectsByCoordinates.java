@@ -44,15 +44,11 @@ public class PlaceObjectsByCoordinates {
         for (GridPoint2 tankCoordinates : tankCoordinatesList) {
             aiTanks.add(new Tank(level, Direction.UP, collisionFinder, 1f, 0.4f, tankCoordinates, incrementedY(tankCoordinates)));
         }
-        for (Tank tank : aiTanks) {
-            collisionFinder.addCollidable(tank);
-        }
     }
 
     private void createTrees() {
         for (GridPoint2 treeCoordinates : treeCoordinatesList) {
             trees.add(new Tree(treeCoordinates, 0f));
-            collisionFinder.addCollidable(trees.get(trees.size() - 1));
         }
     }
 
@@ -61,7 +57,6 @@ public class PlaceObjectsByCoordinates {
 
         for (GridPoint2 bordersCoordinates : bordersList) {
             borders.add(new Tree(bordersCoordinates, 0f));
-            collisionFinder.addCollidable(borders.get(borders.size() - 1));
         }
     }
 

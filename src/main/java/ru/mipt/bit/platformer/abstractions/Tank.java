@@ -9,50 +9,51 @@ import java.util.Collection;
 import java.util.Date;
 
 import ru.mipt.bit.platformer.collisions.FindCollisions;
+import ru.mipt.bit.platformer.ai.IAbstraction;
+import ru.mipt.bit.platformer.ai.commands.IShoot;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.*;
 
-public class Tank implements Collidability {
+public class Tank implements Collidability, IAbstraction, IShoot, Moving {
     private final Level level;
     private final float movementSpeed;
-    private float playerMovementProgress;
-    private float playerRotation;
+    private float tankMovementProgress;
+    private float tankRotation;
     private Direction currentDirection;
     private final FindCollisions collisionFinder;
     private float hp = 3;
     private long lastShoot = new Date().getTime();
     
-    // player current position coordinates on level 10x8 grid (e.g. x=0, y=1)
-    private GridPoint2 playerCoordinates;
-    // which tile the player want to go next
-    private GridPoint2 playerDestinationCoordinates;
+    // tank current position coordinates on level 10x8 grid (e.g. x=0, y=1)
+    private GridPoint2 tankCoordinates;
+    // which tile the tank want to go next
+    private GridPoint2 tankDestinationCoordinates;
 
 
     public Tank( Level level,
                  Direction currentDirection,
                  FindCollisions collisionFinder,
-                 float playerMovementProgress,
+                 float tankMovementProgress,
                  float movementSpeed,
-                 GridPoint2 playerCoordinates, 
-                 GridPoint2 playerDestinationCoordinates) {
+                 GridPoint2 tankCoordinates, 
+                 GridPoint2 tankDestinationCoordinates) {
         this.level = level;
         this.movementSpeed = movementSpeed;
         this.collisionFinder = collisionFinder;
-        this.playerCoordinates = playerCoordinates;
-        this.playerDestinationCoordinates = playerDestinationCoordinates;
-        this.playerMovementProgress = playerMovementProgress;
+        this.tankCoordinates = tankCoordinates;
+        this.tankDestinationCoordinates = tankDestinationCoordinates;
+        this.tankMovementProgress = tankMovementProgress;
         this.currentDirection = currentDirection;
     }
 
     public float getHp() {
         return hp;
     }
-
+    @Override
     public void shoot() {
         if (!canChootInThisTick()) return;
         Bullet bullet = new Bullet(collisionFinder, level, this, currentDirection);
         level.registerBulletCreation(bullet);
-        collisionFinder.addCollidable(bullet);
     }
 
     private boolean canChootInThisTick() {
@@ -64,24 +65,24 @@ public class Tank implements Collidability {
         return false;
     }
 
-    public float getPlayerMovementProgress() {
-        return playerMovementProgress;
+    public float getMovementProgress() {
+        return tankMovementProgress;
+    }
+    @Override
+    public float getRotation() {
+        return tankRotation;
+    }
+    @Override
+    public GridPoint2 getCoordinates() {
+        return tankCoordinates;
     }
 
-    public float getPlayerRotation() {
-        return playerRotation;
-    }
-
-    public GridPoint2 getPlayerCoordinates() {
-        return playerCoordinates;
-    }
-
-    public GridPoint2 getPlayerDestinationCoordinates() {
-        return playerDestinationCoordinates;
+    public GridPoint2 getDestinationCoordinates() {
+        return tankDestinationCoordinates;
     }
 
     public boolean isMoving() {
-        return isEqual(playerMovementProgress, 1f);
+        return isEqual(tankMovementProgress, 1f);
     }
 
     private boolean hasCollision() {
@@ -90,42 +91,41 @@ public class Tank implements Collidability {
 
     // function for moving in all 4 directions
     public void move(Direction direction) {
-        if (!isEqual(playerMovementProgress, 1f)) {
+        if (!isEqual(tankMovementProgress, 1f)) {
             return;
         }
 
         var directionVector = direction.getChangeVector();
-        playerDestinationCoordinates.x += directionVector.x;
-        playerDestinationCoordinates.y += directionVector.y;
+        tankDestinationCoordinates.x += directionVector.x;
+        tankDestinationCoordinates.y += directionVector.y;
 
         if (hasCollision()) {
-            playerDestinationCoordinates.x -= directionVector.x;
-            playerDestinationCoordinates.y -= directionVector.y;
+            tankDestinationCoordinates.x -= directionVector.x;
+            tankDestinationCoordinates.y -= directionVector.y;
         } else {
-            playerMovementProgress = 0f;
+            tankMovementProgress = 0f;
         }
-        playerRotation = direction.getRotation();
+        tankRotation = direction.getRotation();
         currentDirection = direction;
     }
-
+    @Override
     public void processMovementProgress(float deltaTime) {
-        playerMovementProgress = continueProgress(playerMovementProgress, deltaTime, movementSpeed);
-        if (isEqual(playerMovementProgress, 1f)) {
-            // record that the player has reached his/her destination
-            playerCoordinates.set(playerDestinationCoordinates);
+        tankMovementProgress = continueProgress(tankMovementProgress, deltaTime, movementSpeed);
+        if (isEqual(tankMovementProgress, 1f)) {
+            // record that the tank has reached his/her destination
+            tankCoordinates.set(tankDestinationCoordinates);
         }
     }
 
     @Override
     public Collection<GridPoint2> getCoordinateList() {
-        return Arrays.asList(playerCoordinates, playerDestinationCoordinates);
+        return Arrays.asList(tankCoordinates, tankDestinationCoordinates);
     }
 
     @Override
     public void registerDamage() {
         hp--;
         if (hp <= 0) {
-            collisionFinder.deleteCollidable(this);
             level.registerTankDestruction(this);
         }
     }

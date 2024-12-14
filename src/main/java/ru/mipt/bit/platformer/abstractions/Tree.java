@@ -1,11 +1,12 @@
 package ru.mipt.bit.platformer.abstractions;
 
 import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.ai.IAbstraction;
 
 import java.util.Collection;
 import java.util.Collections;
 
-public class Tree  implements Collidability {
+public class Tree  implements Collidability, IAbstraction {
     private final float rotation;
     private final GridPoint2 treeObjectCoordinates;
 
@@ -13,13 +14,16 @@ public class Tree  implements Collidability {
         this.rotation = rotation;
         this.treeObjectCoordinates = treeObjectCoordinates;
     }
-
+    @Override
     public float getRotation() {
         return rotation;
     }
-
+    @Override
     public GridPoint2 getCoordinates() {
         return treeObjectCoordinates;
+    }
+    @Override
+    public void processMovementProgress(float deltaTime) {
     }
 
     @Override

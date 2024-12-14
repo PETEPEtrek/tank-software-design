@@ -10,6 +10,7 @@ import ru.mipt.bit.platformer.levelbuilder.PlaceObjectsByCoordinates;
 import ru.mipt.bit.platformer.engine.Engine;
 import ru.mipt.bit.platformer.collisions.FindCollisions;
 import ru.mipt.bit.platformer.graphics.HpToggle;
+import ru.mipt.bit.platformer.ai.IAbstraction;
 
 import java.io.FileReader;
 import java.util.*;
@@ -100,12 +101,23 @@ public class GenerateFromFile implements ILevelBuilder {
                     collisionFinder);
 
         Tank tank = root.getTank();
+        List<IAbstraction> playerTank = new ArrayList<>();
+        playerTank.add((IAbstraction) tank);
         List<Tank> aiTanks = root.getAiTanks();
-        List<Tree> trees = root.getTrees();
+        List<IAbstraction> aiTanksAbs = new ArrayList<>();
+        for (Tank aiTank: aiTanks) {
+            aiTanksAbs.add((IAbstraction) aiTank);
+        }
 
-        level.addTank(tank);
-        level.addTrees(trees);
-        level.addAiTanks(aiTanks);
+        List<Tree> trees = root.getTrees();
+        List<IAbstraction> treesAbs = new ArrayList<>();
+        for (Tree tree: trees) {
+            treesAbs.add((IAbstraction) tree);
+        }
+
+        level.addAbstraction(playerTank);
+        level.addAbstraction(treesAbs);
+        level.addAbstraction(aiTanksAbs);
         return level;
     }
 

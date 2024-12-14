@@ -3,6 +3,10 @@ package ru.mipt.bit.platformer.levelbuilder;
 import ru.mipt.bit.platformer.abstractions.Bullet;
 import ru.mipt.bit.platformer.abstractions.Tank;
 import ru.mipt.bit.platformer.abstractions.Tree;
+import ru.mipt.bit.platformer.collisions.FindCollisions;
+import ru.mipt.bit.platformer.abstractions.Collidability;
+import ru.mipt.bit.platformer.ai.IAbstraction;
+
 
 import ru.mipt.bit.platformer.eventmanager.EventListener;
 import ru.mipt.bit.platformer.eventmanager.EventPublisher;
@@ -20,6 +24,8 @@ public class Level implements EventPublisher {
     private final Queue<Bullet> bullets = new ConcurrentLinkedDeque<>();
     private final List<Tree> trees = new CopyOnWriteArrayList<>();
     private final List<Tank> aiTanks = new CopyOnWriteArrayList<>();
+    private final List<IAbstraction> abstractions = new CopyOnWriteArrayList<>();
+    private final List<Collidability> collidableObjects = new CopyOnWriteArrayList<>();
 
     public Level(List<Events> eventTypes) {
         eventTypes.forEach(event -> listeners.put(event, new ArrayList<>()));
@@ -35,6 +41,14 @@ public class Level implements EventPublisher {
 
     public void addTrees(List<Tree> trees) {
         this.trees.addAll(trees);
+    }
+
+    public void addAbstraction(List<IAbstraction> abstractions) {
+        this.abstractions.addAll(abstractions);
+    }
+
+    public List<IAbstraction> getAbstractions() {
+        return abstractions;
     }
 
     public Tank getTank() {
@@ -56,14 +70,14 @@ public class Level implements EventPublisher {
         notify(Events.DELETE_TANK, curTank);
     }
 
-    public void registerBulletCreation(Bullet bullet) {
-        bullets.add(bullet);
-        notify(Events.CREATE_BULLET, bullet);
-    }
-
     public void registerBulletDestruction(Bullet bullet) {
         bullets.remove(bullet);
         notify(Events.DELETE_BULLET, bullet);
+    }
+
+    public void registerBulletCreation(Bullet bullet) {
+        bullets.add(bullet);
+        notify(Events.CREATE_BULLET, bullet);
     }
 
 

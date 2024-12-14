@@ -34,14 +34,14 @@ public class TankGraphics implements DrawInterface {
     // calculate interpolated Tank screen coordinates
     @Override
     public void drawMove() {
-        rectangle = tileMovement.moveRectangleBetweenTileCenters(rectangle, tank.getPlayerCoordinates(),
-                tank.getPlayerDestinationCoordinates(), tank.getPlayerMovementProgress());
+        rectangle = tileMovement.moveRectangleBetweenTileCenters(rectangle, tank.getCoordinates(),
+                tank.getDestinationCoordinates(), tank.getMovementProgress());
     }
 
     // render Tank
     @Override
     public void drawTexture(Batch batch) {
-        drawTextureRegionUnscaled(batch, textureRegion, rectangle, tank.getPlayerRotation());
+        drawTextureRegionUnscaled(batch, textureRegion, rectangle, tank.getRotation());
     }
 
     @Override

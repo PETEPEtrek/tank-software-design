@@ -14,7 +14,7 @@ import ru.mipt.bit.platformer.graphics.BulletGraphics;
 import ru.mipt.bit.platformer.graphics.HpToggle;
 import ru.mipt.bit.platformer.graphics.TankWithHpGraphics;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
+import ru.mipt.bit.platformer.ai.IAbstraction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +27,13 @@ public class RendererBuilder {
     private final Texture treeTexture;
     private final Texture bulletTexture;
     private final HpToggle showHp;
+    private final List<IRenderer> drawRenderers;
 
     public RendererBuilder(String levelConfigFileName,
                            String tankTextureFile,
                            String treeTextureFile,
                            String bulletTextureFile,
-                           HpToggle showHp) {
+                           HpToggle showHp, List<IRenderer> drawRenderers) {
         ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("appContext.xml");
 
         TmxMapLoader loader = ctx.getBean("tmxmaploader", TmxMapLoader.class);
@@ -47,6 +48,11 @@ public class RendererBuilder {
         textures.add(bulletTexture);
 
         renderer = new Renderer(this, batch, lvl, new CopyOnWriteArrayList<>());
+
+        for (var drawRenderer: drawRenderers) {
+            drawRenderer.setRenderer(renderer);
+        }
+        this.drawRenderers = drawRenderers;
     }
 
     public List<Texture> getTextures() {
@@ -54,40 +60,17 @@ public class RendererBuilder {
     }
 
     public Renderer generateRenderer(ILevelBuilder levelBuilder) {
-        generateTankGraphics(levelBuilder);
-	    generateAiTanksGraphics(levelBuilder);
-        generateTreesGraphics(levelBuilder);
+        generateGraphics(levelBuilder);
         return renderer;
     }
 
-    private void generateTankGraphics(ILevelBuilder levelBuilder) {
-        Tank tank = levelBuilder.getLevel().getTank();
-        TankGraphics tankGraphics = new TankWithHpGraphics(tank, tankTexture, renderer.getTileMovement(), showHp);
-        renderer.addDrawableObject(tankGraphics);
-    }
-
-    private void generateTreesGraphics(ILevelBuilder levelBuilder) {
-        List<Tree> trees = levelBuilder.getLevel().getTrees();
-        
-        for (Tree tree : trees) {
-            TreeGraphics treeGraphics = new TreeGraphics(tree, treeTexture, renderer.getTileMovement());
-            renderer.addDrawableObject(treeGraphics);
-            renderer.moveRectangleAtTileCenter(treeGraphics.getRectangle(), tree.getCoordinates());
+    private void generateGraphics(ILevelBuilder levelBuilder) {
+        List<IAbstraction> abstractions = levelBuilder.getLevel().getAbstractions();
+        for (IAbstraction abstraction : abstractions) {
+            for (IRenderer drawRenderer: drawRenderers) {
+                drawRenderer.draw(abstraction);
+            }
         }
-    }
-
-    private void generateAiTanksGraphics(ILevelBuilder levelBuilder) {
-        generateTankGraphics(levelBuilder);
-        List<Tank> aiTanks = levelBuilder.getLevel().getAiTanks();
-        for (Tank tank : aiTanks) {
-            TankGraphics tankGraphics = new TankWithHpGraphics(tank, tankTexture, renderer.getTileMovement(), showHp);
-            renderer.addDrawableObject(tankGraphics);
-        }
-    }
-
-    public void generateBulletGraphics(Bullet bullet) {
-        BulletGraphics bulletGraphics = new BulletGraphics(bullet, bulletTexture, renderer.getTileMovement());
-        renderer.addDrawableObject(bulletGraphics);
     }
 
     public HpToggle getHpToggle() {

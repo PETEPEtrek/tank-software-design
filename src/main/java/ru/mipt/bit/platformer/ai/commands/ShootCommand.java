@@ -5,14 +5,14 @@ import ru.mipt.bit.platformer.Direction.Direction;
 import ru.mipt.bit.platformer.abstractions.Tank;
 
 public class ShootCommand implements ICommand {
-    private final Tank tank;
+    private final IShoot shooter;
 
-    public ShootCommand(Tank tank) {
-        this.tank = tank;
+    public ShootCommand(IShoot shooter) {
+        this.shooter = shooter;
     }
 
     @Override
-    public void doCommand() {
-        tank.shoot();
+    public void execute() {
+        shooter.shoot();
     }
 }

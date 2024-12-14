@@ -1,6 +1,7 @@
 package ru.mipt.bit.platformer.abstractions;
 
 import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.ai.IAbstraction;
 import ru.mipt.bit.platformer.collisions.FindCollisions;
 import ru.mipt.bit.platformer.Direction.Direction;
 import ru.mipt.bit.platformer.levelbuilder.Level;
@@ -10,7 +11,7 @@ import java.util.Collections;
 
 import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
-public class Bullet implements Collidability {
+public class Bullet implements Collidability, IAbstraction {
     private final Level level;
 
     private final float rotation;
@@ -28,12 +29,12 @@ public class Bullet implements Collidability {
         this.level = level;
         this.tank = tank;
 
-        GridPoint2 directCoordinate = new GridPoint2(tank.getPlayerCoordinates());
+        GridPoint2 directCoordinate = new GridPoint2(tank.getCoordinates());
         directCoordinate.add(direction.getChangeVector());
         this.coordinates = directCoordinate;
 
         this.toCoordinates = new GridPoint2(this.coordinates);
-        this.rotation = tank.getPlayerRotation();
+        this.rotation = tank.getRotation();
 
         this.direction = direction;
 
@@ -52,7 +53,6 @@ public class Bullet implements Collidability {
                     }
 
                     level.registerBulletDestruction(this);
-                    collisionFinder.deleteCollidable(this);
 
                     return true;
                 }
@@ -60,7 +60,7 @@ public class Bullet implements Collidability {
         }
         return false;
     }
-
+    @Override
     public GridPoint2 getCoordinates() {
         return coordinates;
     }
@@ -69,7 +69,7 @@ public class Bullet implements Collidability {
     public Collection<GridPoint2> getCoordinateList() {
         return Collections.singletonList(coordinates);
     }
-
+    @Override
     public void processMovementProgress(float deltaTime) {
         if (collisionFinder.hasCollisions(this)) {
             return;
@@ -82,7 +82,7 @@ public class Bullet implements Collidability {
             coordinates.add(direction.getChangeVector());
         }
     }
-
+    @Override
     public float getRotation() {
         return rotation;
     }

@@ -42,7 +42,12 @@ public class Renderer implements EventListener {
     @Override
     public void update(Events event, Object object) {
         if (event.equals(Events.CREATE_BULLET)) {
-            rendererBuilder.generateBulletGraphics((Bullet) object);
+            for (DrawInterface drawable : drawables) {
+
+                if (drawable.getDrawnObject() == object) {
+                    addDrawableObject(drawable);
+                }
+            }
         }
         if (event.equals(Events.DELETE_BULLET) || event.equals(Events.DELETE_TANK)) {
             for (DrawInterface drawable : drawables) {

@@ -10,12 +10,38 @@ import ru.mipt.bit.platformer.util.TileMovement;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 
-public class TankWithHpGraphics extends TankGraphics {
+import static ru.mipt.bit.platformer.util.GdxGameUtils.createBoundingRectangle;
+import static ru.mipt.bit.platformer.util.GdxGameUtils.drawTextureRegionUnscaled;
+
+public class TankWithHpGraphics implements DrawInterface {
     private HpToggle toggler;
+    protected Rectangle rectangle;
+
+    protected final Tank tank;
+
+    private final Texture texture;
+    private final TextureRegion textureRegion;
+
+    private final TileMovement tileMovement;
 
     public TankWithHpGraphics(Tank tank, Texture texture, TileMovement tileMovement, HpToggle toggler) {
-        super(tank, texture, tileMovement);
+        this.tank = tank;
+        this.texture = texture;
+        this.textureRegion = new TextureRegion(texture);
+        this.rectangle = createBoundingRectangle(textureRegion);
+        this.tileMovement = tileMovement;
         this.toggler = toggler;
+    }
+
+    @Override
+    public void drawMove() {
+        rectangle = tileMovement.moveRectangleBetweenTileCenters(rectangle, tank.getCoordinates(),
+                tank.getDestinationCoordinates(), tank.getMovementProgress());
+    }
+
+    @Override
+    public Object getDrawnObject() {
+        return tank;
     }
 
     private static TextureRegion getHealthBar(float health, Color color) {
@@ -37,6 +63,9 @@ public class TankWithHpGraphics extends TankGraphics {
             GdxGameUtils.drawTextureRegionUnscaled(batch, healthBgBar, hpRectangle, 0);
             GdxGameUtils.drawTextureRegionUnscaled(batch, healthLeftBar, hpRectangle, 0);
         }
-        super.drawTexture(batch);
+        rectangle = tileMovement.moveRectangleBetweenTileCenters(rectangle, tank.getCoordinates(),
+                tank.getDestinationCoordinates(), tank.getMovementProgress());
+
+        drawTextureRegionUnscaled(batch, textureRegion, rectangle, tank.getRotation());
     }
 }
